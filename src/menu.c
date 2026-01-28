@@ -53,7 +53,7 @@ void Menu_Update(MenuSystem* menu) {
     if (!menu->isActive) return;
     
     static SceCtrlData pad;
-    static SceCtrlData oldPad;
+    static SceCtrlData oldPad = {0};
     
     oldPad = pad;
     sceCtrlReadBufferPositive(&pad, 1);
@@ -69,17 +69,21 @@ void Menu_Update(MenuSystem* menu) {
         itemCount = sizeof(optionsMenuItems) / sizeof(MenuItem);
     }
     
-    // Navigation
-    if (Keybinds_IsActionPressed(&g_keybinds, ACTION_MENU_DOWN, &pad)) {
+    // Navigation - detect button press (not held)
+    unsigned int downButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_DOWN);
+    unsigned int upButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_UP);
+    unsigned int selectButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_SELECT);
+    
+    if ((pad.Buttons & downButton) && !(oldPad.Buttons & downButton)) {
         menu->selectedItem = (menu->selectedItem + 1) % itemCount;
     }
     
-    if (Keybinds_IsActionPressed(&g_keybinds, ACTION_MENU_UP, &pad)) {
+    if ((pad.Buttons & upButton) && !(oldPad.Buttons & upButton)) {
         menu->selectedItem = (menu->selectedItem - 1 + itemCount) % itemCount;
     }
     
-    // Selection
-    if (Keybinds_IsActionPressed(&g_keybinds, ACTION_MENU_SELECT, &pad)) {
+    // Selection - detect button press (not held)
+    if ((pad.Buttons & selectButton) && !(oldPad.Buttons & selectButton)) {
         if (items && items[menu->selectedItem].action) {
             items[menu->selectedItem].action();
         }

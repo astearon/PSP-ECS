@@ -98,26 +98,24 @@ int main(void) {
     Scene_CreateTestScene(&g_world);
     
     // Main game loop
+    SceCtrlData pad = {0};
+    SceCtrlData oldPad = {0};
+    
     while (running && !WindowShouldClose()) {
         float deltaTime = GetFrameTime();
         
         // Input handling
-        SceCtrlData pad;
+        oldPad = pad;
         sceCtrlReadBufferPositive(&pad, 1);
         
         // Toggle menu with START button
-        static bool startWasPressed = false;
-        if (Keybinds_IsActionPressed(&g_keybinds, ACTION_TOGGLE_MENU, &pad)) {
-            if (!startWasPressed) {
-                if (Menu_IsActive(&g_menu)) {
-                    Menu_Hide(&g_menu);
-                } else {
-                    Menu_Show(&g_menu, MENU_MAIN);
-                }
-                startWasPressed = true;
+        unsigned int startButton = Keybinds_GetBinding(&g_keybinds, ACTION_TOGGLE_MENU);
+        if ((pad.Buttons & startButton) && !(oldPad.Buttons & startButton)) {
+            if (Menu_IsActive(&g_menu)) {
+                Menu_Hide(&g_menu);
+            } else {
+                Menu_Show(&g_menu, MENU_MAIN);
             }
-        } else {
-            startWasPressed = false;
         }
         
         // Update

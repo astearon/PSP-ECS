@@ -63,15 +63,11 @@ unsigned int Keybinds_GetBinding(KeyBindingSystem* system, ActionID action) {
 }
 
 bool Keybinds_IsActionPressed(KeyBindingSystem* system, ActionID action, SceCtrlData* pad) {
-    static SceCtrlData oldPad = {0};
-    
     if (action < 0 || action >= ACTION_COUNT) return false;
     
+    // Note: Press detection should be handled by caller comparing current and previous pad state
     unsigned int button = system->bindings[action].button;
-    bool pressed = (pad->Buttons & button) && !(oldPad.Buttons & button);
-    
-    oldPad = *pad;
-    return pressed;
+    return (pad->Buttons & button) != 0;
 }
 
 bool Keybinds_IsActionHeld(KeyBindingSystem* system, ActionID action, SceCtrlData* pad) {

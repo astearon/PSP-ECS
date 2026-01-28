@@ -2,6 +2,7 @@
 #define KEYBINDS_H
 
 #include <pspctrl.h>
+#include <stdbool.h>
 
 // Action IDs
 typedef enum {
@@ -34,7 +35,7 @@ typedef struct {
 void Keybinds_Init(KeyBindingSystem* system);
 void Keybinds_SetBinding(KeyBindingSystem* system, ActionID action, unsigned int button);
 unsigned int Keybinds_GetBinding(KeyBindingSystem* system, ActionID action);
-bool Keybinds_IsActionPressed(KeyBindingSystem* system, ActionID action, SceCtrlData* pad);
+bool Keybinds_IsActionPressed(KeyBindingSystem* system, ActionID action, SceCtrlData* pad); // Note: Checks if button is currently pressed (held)
 bool Keybinds_IsActionHeld(KeyBindingSystem* system, ActionID action, SceCtrlData* pad);
 const char* Keybinds_GetActionName(ActionID action);
 void Keybinds_Save(KeyBindingSystem* system);
