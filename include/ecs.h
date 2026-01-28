@@ -6,6 +6,7 @@
 
 // Maximum entities and components
 #define MAX_ENTITIES 256
+// MAX_COMPONENTS reserved for future expansion, currently using COMPONENT_COUNT
 #define MAX_COMPONENTS 8
 
 // Component type IDs
@@ -74,10 +75,9 @@ void* ECS_AddComponent(ECSWorld* world, EntityID id, ComponentType type);
 void* ECS_GetComponent(ECSWorld* world, EntityID id, ComponentType type);
 bool ECS_HasComponent(ECSWorld* world, EntityID id, ComponentType type);
 void ECS_RemoveComponent(ECSWorld* world, EntityID id, ComponentType type);
+void ECS_Cleanup(ECSWorld* world);
 
 // System functions
-void System_Input(ECSWorld* world);
-void System_CameraUpdate(ECSWorld* world, float deltaTime);
 void System_Render(ECSWorld* world);
 
 #endif // ECS_H

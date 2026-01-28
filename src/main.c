@@ -98,6 +98,7 @@ int main(void) {
     Scene_CreateTestScene(&g_world);
     
     // Main game loop
+    // Initialize pad states (oldPad starts at zero, meaning no buttons pressed on first frame)
     SceCtrlData pad = {0};
     SceCtrlData oldPad = {0};
     
@@ -149,6 +150,7 @@ int main(void) {
     }
     
     // Cleanup
+    ECS_Cleanup(&g_world);
     CloseWindow();
     
     sceKernelExitGame();

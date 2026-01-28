@@ -62,19 +62,16 @@ unsigned int Keybinds_GetBinding(KeyBindingSystem* system, ActionID action) {
     return system->bindings[action].button;
 }
 
-bool Keybinds_IsActionPressed(KeyBindingSystem* system, ActionID action, SceCtrlData* pad) {
+bool Keybinds_IsActionDown(KeyBindingSystem* system, ActionID action, SceCtrlData* pad) {
     if (action < 0 || action >= ACTION_COUNT) return false;
     
-    // Note: Press detection should be handled by caller comparing current and previous pad state
     unsigned int button = system->bindings[action].button;
     return (pad->Buttons & button) != 0;
 }
 
 bool Keybinds_IsActionHeld(KeyBindingSystem* system, ActionID action, SceCtrlData* pad) {
-    if (action < 0 || action >= ACTION_COUNT) return false;
-    
-    unsigned int button = system->bindings[action].button;
-    return (pad->Buttons & button) != 0;
+    // Alias for IsActionDown - both check if button is currently held
+    return Keybinds_IsActionDown(system, action, pad);
 }
 
 const char* Keybinds_GetActionName(ActionID action) {

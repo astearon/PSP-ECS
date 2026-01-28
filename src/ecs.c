@@ -59,53 +59,56 @@ void* ECS_AddComponent(ECSWorld* world, EntityID id, ComponentType type) {
         case COMPONENT_TRANSFORM:
             size = sizeof(TransformComponent);
             component = malloc(size);
-            if (component) {
-                TransformComponent* transform = (TransformComponent*)component;
-                transform->position = (Vector3){0, 0, 0};
-                transform->rotation = (Vector3){0, 0, 0};
-                transform->scale = (Vector3){1, 1, 1};
+            if (!component) {
+                // Memory allocation failed - critical on PSP with limited RAM
+                return NULL;
             }
+            TransformComponent* transform = (TransformComponent*)component;
+            transform->position = (Vector3){0, 0, 0};
+            transform->rotation = (Vector3){0, 0, 0};
+            transform->scale = (Vector3){1, 1, 1};
             break;
         case COMPONENT_RENDERABLE:
             size = sizeof(RenderableComponent);
             component = malloc(size);
-            if (component) {
-                RenderableComponent* renderable = (RenderableComponent*)component;
-                renderable->type = RENDERABLE_CUBE;
-                renderable->color = WHITE;
-                renderable->size = (Vector3){1, 1, 1};
+            if (!component) {
+                return NULL;
             }
+            RenderableComponent* renderable = (RenderableComponent*)component;
+            renderable->type = RENDERABLE_CUBE;
+            renderable->color = WHITE;
+            renderable->size = (Vector3){1, 1, 1};
             break;
         case COMPONENT_CAMERA:
             size = sizeof(CameraComponent);
             component = malloc(size);
-            if (component) {
-                CameraComponent* camera = (CameraComponent*)component;
-                camera->camera.position = (Vector3){10.0f, 10.0f, 10.0f};
-                camera->camera.target = (Vector3){0.0f, 0.0f, 0.0f};
-                camera->camera.up = (Vector3){0.0f, 1.0f, 0.0f};
-                camera->camera.fovy = 45.0f;
-                camera->camera.projection = CAMERA_PERSPECTIVE;
-                camera->moveSpeed = 5.0f;
-                camera->lookSpeed = 2.0f;
+            if (!component) {
+                return NULL;
             }
+            CameraComponent* camera = (CameraComponent*)component;
+            camera->camera.position = (Vector3){10.0f, 10.0f, 10.0f};
+            camera->camera.target = (Vector3){0.0f, 0.0f, 0.0f};
+            camera->camera.up = (Vector3){0.0f, 1.0f, 0.0f};
+            camera->camera.fovy = 45.0f;
+            camera->camera.projection = CAMERA_PERSPECTIVE;
+            camera->moveSpeed = 5.0f;
+            camera->lookSpeed = 2.0f;
             break;
         case COMPONENT_INPUT:
             size = sizeof(InputComponent);
             component = malloc(size);
-            if (component) {
-                InputComponent* input = (InputComponent*)component;
-                input->active = true;
+            if (!component) {
+                return NULL;
             }
+            InputComponent* input = (InputComponent*)component;
+            input->active = true;
             break;
         default:
             return NULL;
     }
     
-    if (component) {
-        world->entities[id].components[type] = component;
-        world->entities[id].componentMask |= (1 << type);
-    }
+    world->entities[id].components[type] = component;
+    world->entities[id].componentMask |= (1 << type);
     
     return component;
 }
@@ -170,6 +173,15 @@ void System_Render(ECSWorld* world) {
                         break;
                 }
             }
+        }
+    }
+}
+
+void ECS_Cleanup(ECSWorld* world) {
+    // Destroy all active entities and free their components
+    for (int i = 0; i < MAX_ENTITIES; i++) {
+        if (world->entities[i].active) {
+            ECS_DestroyEntity(world, i);
         }
     }
 }

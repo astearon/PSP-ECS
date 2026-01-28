@@ -52,6 +52,7 @@ static void Menu_Action_Back(void) {
 void Menu_Update(MenuSystem* menu) {
     if (!menu->isActive) return;
     
+    // Track button states for press detection (oldPad initialized to zero on first call)
     static SceCtrlData pad;
     static SceCtrlData oldPad = {0};
     

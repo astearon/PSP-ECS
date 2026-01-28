@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <pspctrl.h>
 #include <raymath.h>
+#include <stdlib.h>
 
 void Camera_UpdateControls(CameraComponent* camera, KeyBindingSystem* keybinds, float deltaTime) {
     if (!camera) return;
@@ -42,9 +43,14 @@ void Camera_UpdateControls(CameraComponent* camera, KeyBindingSystem* keybinds, 
     camera->camera.target = Vector3Add(camera->camera.target, movement);
     
     // Analog stick for camera rotation
-    if (pad.Lx != 128 || pad.Ly != 128) {
-        float rotX = (pad.Lx - 128) / 128.0f * camera->lookSpeed * deltaTime;
-        float rotY = (pad.Ly - 128) / 128.0f * camera->lookSpeed * deltaTime;
+    // Apply dead zone to prevent drift (analog center is 128, accept 118-138 as neutral)
+    const int ANALOG_DEAD_ZONE = 10;
+    int analogX = pad.Lx - 128;
+    int analogY = pad.Ly - 128;
+    
+    if (abs(analogX) > ANALOG_DEAD_ZONE || abs(analogY) > ANALOG_DEAD_ZONE) {
+        float rotX = (analogX / 128.0f) * camera->lookSpeed * deltaTime;
+        float rotY = (analogY / 128.0f) * camera->lookSpeed * deltaTime;
         
         // Update target based on rotation
         Vector3 direction = Vector3Subtract(camera->camera.target, camera->camera.position);

@@ -35,8 +35,8 @@ typedef struct {
 void Keybinds_Init(KeyBindingSystem* system);
 void Keybinds_SetBinding(KeyBindingSystem* system, ActionID action, unsigned int button);
 unsigned int Keybinds_GetBinding(KeyBindingSystem* system, ActionID action);
-bool Keybinds_IsActionPressed(KeyBindingSystem* system, ActionID action, SceCtrlData* pad); // Note: Checks if button is currently pressed (held)
-bool Keybinds_IsActionHeld(KeyBindingSystem* system, ActionID action, SceCtrlData* pad);
+bool Keybinds_IsActionDown(KeyBindingSystem* system, ActionID action, SceCtrlData* pad); // Checks if button is currently held down
+bool Keybinds_IsActionHeld(KeyBindingSystem* system, ActionID action, SceCtrlData* pad); // Alias for IsActionDown
 const char* Keybinds_GetActionName(ActionID action);
 void Keybinds_Save(KeyBindingSystem* system);
 void Keybinds_Load(KeyBindingSystem* system);
