@@ -1,6 +1,27 @@
 #include "ecs.h"
+#include <rlgl.h>
 #include <stdlib.h>
 #include <string.h>
+
+static void DrawPlaneWireframe(Vector3 center, Vector2 size, Color color) {
+    float halfWidth = size.x * 0.5f;
+    float halfLength = size.y * 0.5f;
+
+    rlBegin(RL_LINES);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+    rlVertex3f(center.x - halfWidth, center.y, center.z - halfLength);
+    rlVertex3f(center.x + halfWidth, center.y, center.z - halfLength);
+
+    rlVertex3f(center.x + halfWidth, center.y, center.z - halfLength);
+    rlVertex3f(center.x + halfWidth, center.y, center.z + halfLength);
+
+    rlVertex3f(center.x + halfWidth, center.y, center.z + halfLength);
+    rlVertex3f(center.x - halfWidth, center.y, center.z + halfLength);
+
+    rlVertex3f(center.x - halfWidth, center.y, center.z + halfLength);
+    rlVertex3f(center.x - halfWidth, center.y, center.z - halfLength);
+    rlEnd();
+}
 
 void ECS_Init(ECSWorld* world) {
     memset(world, 0, sizeof(ECSWorld));
@@ -167,8 +188,14 @@ void System_Render(ECSWorld* world) {
                                      BLACK);
                         break;
                     case RENDERABLE_GRID:
-                        DrawGrid(20, 1.0f);
+                        DrawGrid(10, 5.0f);
                         break;
+                    case RENDERABLE_PLANE: {
+                        Vector2 size = {renderable->size.x, renderable->size.z};
+                        DrawPlane(transform->position, size, renderable->color);
+                        DrawPlaneWireframe(transform->position, size, (Color){80, 80, 80, 255});
+                        break;
+                    }
                     default:
                         break;
                 }

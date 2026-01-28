@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <rlgl.h>
 #include <pspctrl.h>
 #include <pspdebug.h>
 #include <pspkernel.h>
@@ -89,6 +90,8 @@ int main(void) {
     const int screenHeight = 272;
     
     InitWindow(screenWidth, screenHeight, "PSP-ECS Demo");
+    SetWindowSize(screenWidth, screenHeight);
+    rlSetClipPlanes(0.01f, 1000.0f);
     SetTargetFPS(60);
     
     // Initialize systems

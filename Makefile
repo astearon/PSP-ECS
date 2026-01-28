@@ -8,6 +8,7 @@ INCDIR  := include .
 INCDIR  += $(PSPSDK)/include
 
 CFLAGS   = -O2 -G0 -Wall $(addprefix -I,$(INCDIR))
+CFLAGS  += -g -O0
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS  = $(CFLAGS)
 

@@ -30,10 +30,10 @@ void Keybinds_Init(KeyBindingSystem* system) {
     system->bindings[ACTION_MOVE_RIGHT].button = PSP_CTRL_RIGHT;
     system->bindings[ACTION_MOVE_RIGHT].name = actionNames[ACTION_MOVE_RIGHT];
     
-    system->bindings[ACTION_MOVE_UP].button = PSP_CTRL_TRIANGLE;
+    system->bindings[ACTION_MOVE_UP].button = PSP_CTRL_LTRIGGER;
     system->bindings[ACTION_MOVE_UP].name = actionNames[ACTION_MOVE_UP];
     
-    system->bindings[ACTION_MOVE_DOWN].button = PSP_CTRL_CROSS;
+    system->bindings[ACTION_MOVE_DOWN].button = PSP_CTRL_RTRIGGER;
     system->bindings[ACTION_MOVE_DOWN].name = actionNames[ACTION_MOVE_DOWN];
     
     system->bindings[ACTION_MENU_UP].button = PSP_CTRL_UP;
