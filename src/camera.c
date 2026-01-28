@@ -31,11 +31,11 @@ void Camera_UpdateControls(CameraComponent* camera, KeyBindingSystem* keybinds, 
     }
     
     if (Keybinds_IsActionHeld(keybinds, ACTION_MOVE_UP, &pad)) {
-        movement = Vector3Add(movement, Vector3Scale(camera->camera.up, camera->moveSpeed * deltaTime));
+        movement = Vector3Add(movement, Vector3Scale(camera->camera.up, -camera->moveSpeed * deltaTime));
     }
     
     if (Keybinds_IsActionHeld(keybinds, ACTION_MOVE_DOWN, &pad)) {
-        movement = Vector3Add(movement, Vector3Scale(camera->camera.up, -camera->moveSpeed * deltaTime));
+        movement = Vector3Add(movement, Vector3Scale(camera->camera.up, camera->moveSpeed * deltaTime));
     }
     
     // Apply movement
@@ -49,8 +49,8 @@ void Camera_UpdateControls(CameraComponent* camera, KeyBindingSystem* keybinds, 
     int analogY = pad.Ly - 128;
     
     if (abs(analogX) > ANALOG_DEAD_ZONE || abs(analogY) > ANALOG_DEAD_ZONE) {
-        float rotX = (analogX / 128.0f) * camera->lookSpeed * deltaTime;
-        float rotY = (analogY / 128.0f) * camera->lookSpeed * deltaTime;
+        float rotX = (-analogX / 128.0f) * camera->lookSpeed * deltaTime;
+        float rotY = (-analogY / 128.0f) * camera->lookSpeed * deltaTime;
         
         // Update target based on rotation
         Vector3 direction = Vector3Subtract(camera->camera.target, camera->camera.position);

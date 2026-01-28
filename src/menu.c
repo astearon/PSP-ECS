@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <pspctrl.h>
 #include <string.h>
+#include <stdio.h>
 
 extern KeyBindingSystem g_keybinds;
 

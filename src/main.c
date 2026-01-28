@@ -19,20 +19,20 @@ ECSWorld g_world;
 // Exit callback
 int running = 1;
 
-int exit_callback(int arg1, int arg2, void *common) {
+int GameExitCallback(int arg1, int arg2, void *common) {
     running = 0;
     return 0;
 }
 
-int CallbackThread(SceSize args, void *argp) {
-    int cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
+int GameCallbackThread(SceSize args, void *argp) {
+    int cbid = sceKernelCreateCallback("Exit Callback", GameExitCallback, NULL);
     sceKernelRegisterExitCallback(cbid);
     sceKernelSleepThreadCB();
     return 0;
 }
 
-int SetupCallbacks(void) {
-    int thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
+int SetupGameCallbacks(void) {
+    int thid = sceKernelCreateThread("update_thread", GameCallbackThread, 0x11, 0xFA0, 0, 0);
     if(thid >= 0) {
         sceKernelStartThread(thid, 0, 0);
     }
@@ -78,7 +78,7 @@ void RenderScene(void) {
 }
 
 int main(void) {
-    SetupCallbacks();
+    SetupGameCallbacks();
     
     // Initialize PSP controller
     sceCtrlSetSamplingCycle(0);

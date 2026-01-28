@@ -2,13 +2,18 @@ TARGET = PSP-ECS
 OBJS = src/main.o src/ecs.o src/menu.o src/keybinds.o src/scene.o src/camera.o
 
 INCDIR = include
-CFLAGS = -O2 -G0 -Wall -I$(INCDIR)
+PSPSDK := $(shell psp-config --pspsdk-path)
+
+INCDIR  := include .
+INCDIR  += $(PSPSDK)/include
+
+CFLAGS   = -O2 -G0 -Wall $(addprefix -I,$(INCDIR))
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS = $(CFLAGS)
+ASFLAGS  = $(CFLAGS)
 
 LIBDIR =
 LDFLAGS =
-LIBS = -lraylib -lGL -lm -lpspgu -lpspge -lpspdisplay -lpspctrl -lpspaudio -lpsppower -lpsputility
+LIBS = -lraylib -lGL -lpspvfpu -lm -lpspgu -lpspge -lpspdisplay -lpspctrl -lpspaudio -lpsppower -lpsputility
 
 EXTRA_TARGETS = EBOOT.PBP
 PSP_EBOOT_TITLE = PSP-ECS Demo
