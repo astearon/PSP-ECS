@@ -34,8 +34,7 @@ Install raylib for PSP from https://github.com/raylib4Consoles/raylib4Psp
 ```bash
 git clone https://github.com/raylib4Consoles/raylib4Psp.git
 cd raylib4Psp
-make -f Makefile.PSP
-make -f Makefile.PSP install
+./pspbuild.sh
 ```
 
 This will install raylib to `$PSPDEV/psp/sdk/lib/` and headers to `$PSPDEV/psp/sdk/include/`.
