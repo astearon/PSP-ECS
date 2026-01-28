@@ -39,7 +39,7 @@ int SetupCallbacks(void) {
     return thid;
 }
 
-void UpdateCamera(float deltaTime) {
+void UpdateGameCamera(float deltaTime) {
     // Find camera entity and update it
     for (int i = 0; i < MAX_ENTITIES; i++) {
         if (!g_world.entities[i].active) continue;
@@ -123,7 +123,7 @@ int main(void) {
         if (Menu_IsActive(&g_menu)) {
             Menu_Update(&g_menu);
         } else {
-            UpdateCamera(deltaTime);
+                UpdateGameCamera(deltaTime);
         }
         
         // Render
