@@ -7,7 +7,8 @@
 typedef enum {
     MENU_NONE,
     MENU_MAIN,
-    MENU_OPTIONS
+    MENU_OPTIONS,
+    MENU_KEYBINDINGS
 } MenuState;
 
 // Menu item structure

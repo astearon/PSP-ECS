@@ -13,6 +13,7 @@ static void Menu_Action_Options(void);
 static void Menu_Action_Back(void);
 static void Menu_Action_Save(void);
 static void Menu_Action_Load(void);
+static void Menu_Action_Keybindings(void);
 
 static MenuItem mainMenuItems[] = {
     {"Start Game", Menu_Action_Start},
@@ -22,7 +23,7 @@ static MenuItem mainMenuItems[] = {
 };
 
 static MenuItem optionsMenuItems[] = {
-    {"Keybindings", NULL},
+    {"Keybindings", Menu_Action_Keybindings},
     {"Back", Menu_Action_Back}
 };
 
@@ -63,6 +64,13 @@ static void Menu_Action_Options(void) {
 static void Menu_Action_Back(void) {
     if (g_currentMenu) {
         g_currentMenu->currentMenu = MENU_MAIN;
+        g_currentMenu->selectedItem = 0;
+    }
+}
+
+static void Menu_Action_Keybindings(void) {
+    if (g_currentMenu) {
+        g_currentMenu->currentMenu = MENU_KEYBINDINGS;
         g_currentMenu->selectedItem = 0;
     }
 }
@@ -108,12 +116,17 @@ void Menu_Update(MenuSystem* menu) {
     } else if (menu->currentMenu == MENU_OPTIONS) {
         items = optionsMenuItems;
         itemCount = sizeof(optionsMenuItems) / sizeof(MenuItem);
+    } else if (menu->currentMenu == MENU_KEYBINDINGS) {
+        // No items for keybindings screen (display only)
+        itemCount = 0;
+        items = NULL;
     }
     
     // Navigation - detect button press (not held)
     unsigned int downButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_DOWN);
     unsigned int upButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_UP);
     unsigned int selectButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_SELECT);
+    unsigned int backButton = Keybinds_GetBinding(&g_keybinds, ACTION_MENU_BACK);
     
     if ((pad.Buttons & downButton) && !(oldPad.Buttons & downButton)) {
         menu->selectedItem = (menu->selectedItem + 1) % itemCount;
@@ -127,6 +140,18 @@ void Menu_Update(MenuSystem* menu) {
     if ((pad.Buttons & selectButton) && !(oldPad.Buttons & selectButton)) {
         if (items && items[menu->selectedItem].action) {
             items[menu->selectedItem].action();
+        }
+    }
+    
+    // Back button - detect button press (not held)
+    if ((pad.Buttons & backButton) && !(oldPad.Buttons & backButton)) {
+        if (menu->currentMenu == MENU_MAIN) {
+            // Close menu if at main menu
+            Menu_Hide(menu);
+        } else {
+            // Go back to main menu from any other menu
+            menu->currentMenu = MENU_MAIN;
+            menu->selectedItem = 0;
         }
     }
 }
@@ -152,28 +177,102 @@ void Menu_Render(MenuSystem* menu) {
         items = optionsMenuItems;
         itemCount = sizeof(optionsMenuItems) / sizeof(MenuItem);
         title = "OPTIONS";
+    } else if (menu->currentMenu == MENU_KEYBINDINGS) {
+        items = NULL;
+        itemCount = 0;
+        title = "KEYBINDINGS";
     }
     
     // Draw title
     int titleWidth = MeasureText(title, 30);
-    DrawText(title, (screenWidth - titleWidth) / 2, 50, 30, WHITE);
+    DrawText(title, (screenWidth - titleWidth) / 2, 10, 30, WHITE);
     
-    // Draw menu items
-    int startY = 120;
-    int itemSpacing = 40;
-    
-    for (int i = 0; i < itemCount; i++) {
-        Color color = (i == menu->selectedItem) ? YELLOW : WHITE;
-        const char* prefix = (i == menu->selectedItem) ? "> " : "  ";
-        char text[256];
-        snprintf(text, sizeof(text), "%s%s", prefix, items[i].text);
+    // Draw menu items or keybindings display
+    if (menu->currentMenu == MENU_KEYBINDINGS) {
+        // Display in-game keybindings (excluding menu actions)
+        int startY = 55;
+        int lineSpacing = 22;
+        int currentY = startY;
         
-        int textWidth = MeasureText(text, 20);
-        DrawText(text, (screenWidth - textWidth) / 2, startY + i * itemSpacing, 20, color);
+        // Helper function to get button name
+        const char* GetButtonName(unsigned int button) {
+            switch(button) {
+                case PSP_CTRL_UP: return "D-Pad Up";
+                case PSP_CTRL_DOWN: return "D-Pad Down";
+                case PSP_CTRL_LEFT: return "D-Pad Left";
+                case PSP_CTRL_RIGHT: return "D-Pad Right";
+                case PSP_CTRL_TRIANGLE: return "Triangle";
+                case PSP_CTRL_CIRCLE: return "Circle";
+                case PSP_CTRL_CROSS: return "Cross";
+                case PSP_CTRL_SQUARE: return "Square";
+                case PSP_CTRL_LTRIGGER: return "L Trigger";
+                case PSP_CTRL_RTRIGGER: return "R Trigger";
+                case PSP_CTRL_START: return "Start";
+                case PSP_CTRL_SELECT: return "Select";
+                default: return "Unknown";
+            }
+        }
+        
+        // Display in-game actions only
+        ActionID inGameActions[] = {
+            ACTION_MOVE_FORWARD,
+            ACTION_MOVE_BACKWARD,
+            ACTION_MOVE_LEFT,
+            ACTION_MOVE_RIGHT,
+            ACTION_MOVE_UP,
+            ACTION_MOVE_DOWN,
+            ACTION_TOGGLE_MENU
+        };
+        
+        // First pass: calculate max width for centering
+        int maxWidth = 0;
+        for (int i = 0; i < 7; i++) {
+            ActionID action = inGameActions[i];
+            unsigned int button = Keybinds_GetBinding(&g_keybinds, action);
+            const char* actionName = Keybinds_GetActionName(action);
+            const char* buttonName = GetButtonName(button);
+            
+            char line[128];
+            snprintf(line, sizeof(line), "%s: %s", actionName, buttonName);
+            int lineWidth = MeasureText(line, 16);
+            if (lineWidth > maxWidth) maxWidth = lineWidth;
+        }
+        
+        // Second pass: draw centered
+        currentY = startY;
+        for (int i = 0; i < 7; i++) {
+            ActionID action = inGameActions[i];
+            unsigned int button = Keybinds_GetBinding(&g_keybinds, action);
+            const char* actionName = Keybinds_GetActionName(action);
+            const char* buttonName = GetButtonName(button);
+            
+            char line[128];
+            snprintf(line, sizeof(line), "%s: %s", actionName, buttonName);
+            int lineWidth = MeasureText(line, 16);
+            int xPos = (screenWidth - lineWidth) / 2;
+            DrawText(line, xPos, currentY, 16, WHITE);
+            currentY += lineSpacing;
+        }
+    } else {
+        // Draw menu items
+        int startY = 55;
+        int itemSpacing = 40;
+        
+        for (int i = 0; i < itemCount; i++) {
+            Color color = (i == menu->selectedItem) ? YELLOW : WHITE;
+            const char* prefix = (i == menu->selectedItem) ? "> " : "  ";
+            char text[256];
+            snprintf(text, sizeof(text), "%s%s", prefix, items[i].text);
+            
+            int textWidth = MeasureText(text, 20);
+            DrawText(text, (screenWidth - textWidth) / 2, startY + i * itemSpacing, 20, color);
+        }
     }
     
     // Draw controls help
-    DrawText("UP/DOWN: Navigate | X: Select", 10, screenHeight - 30, 15, LIGHTGRAY);
+    const char* helpText = "UP/DOWN: Navigate | X: Select | O: Back";
+    int helpWidth = MeasureText(helpText, 15);
+    DrawText(helpText, (screenWidth - helpWidth) / 2, screenHeight - 30, 15, LIGHTGRAY);
 
     if (g_statusMessage[0] != '\0') {
         int msgWidth = MeasureText(g_statusMessage, 18);

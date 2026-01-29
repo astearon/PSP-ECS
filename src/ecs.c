@@ -114,6 +114,7 @@ void* ECS_AddComponent(ECSWorld* world, EntityID id, ComponentType type) {
             camera->camera.projection = CAMERA_PERSPECTIVE;
             camera->moveSpeed = 5.0f;
             camera->lookSpeed = 2.0f;
+            camera->pitch = 0.0f;
             break;
         case COMPONENT_INPUT:
             size = sizeof(InputComponent);

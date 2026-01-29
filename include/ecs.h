@@ -47,6 +47,7 @@ typedef struct {
     Camera3D camera;
     float moveSpeed;
     float lookSpeed;
+    float pitch;  // Vertical angle for clamping
 } CameraComponent;
 
 // Input Component

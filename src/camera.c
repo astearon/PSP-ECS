@@ -52,6 +52,18 @@ void Camera_UpdateControls(CameraComponent* camera, KeyBindingSystem* keybinds, 
         float rotX = (-analogX / 128.0f) * camera->lookSpeed * deltaTime;
         float rotY = (-analogY / 128.0f) * camera->lookSpeed * deltaTime;
         
+        // Update pitch and clamp to ±88 degrees
+        const float MAX_PITCH = 88.0f;
+        const float RAD_TO_DEG = 57.29577951f;
+        const float DEG_TO_RAD = 0.01745329251f;
+        
+        camera->pitch += rotY * RAD_TO_DEG;
+        if (camera->pitch > MAX_PITCH) camera->pitch = MAX_PITCH;
+        if (camera->pitch < -MAX_PITCH) camera->pitch = -MAX_PITCH;
+        
+        // Calculate new rotation amount respecting the clamp
+        rotY = (camera->pitch - (camera->pitch - rotY * RAD_TO_DEG)) * DEG_TO_RAD;
+        
         // Update target based on rotation
         Vector3 direction = Vector3Subtract(camera->camera.target, camera->camera.position);
         float distance = Vector3Length(direction);
